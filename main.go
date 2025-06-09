@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Print(1)
+	BB()
 }
 
-func A() int {
-	return 1
+func BB() {
+	fmt.Print(1)
 }
