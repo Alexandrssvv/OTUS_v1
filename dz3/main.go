@@ -2,21 +2,28 @@ package main
 
 import "fmt"
 
-func ScoringResult(score int) {
-	x := ""
-	for i := 0; i < score; i++ {
-		for j := 0; j < score; j++ {
+func GenerateBoard(size int) {
+	row := ""
+	for i := 0; i < size; i++ {
+		for j := 0; j < size; j++ {
 			if (i+j)%2 == 0 {
-				x = x + "#"
+				row = row + "#"
 			} else {
-				x = x + " "
+				row = row + " "
 			}
 		}
-		fmt.Println(x)
-		x = ""
+		fmt.Println(row)
+		row = ""
 	}
 }
 
 func main() {
-	ScoringResult(8)
+	var size int
+	fmt.Print("Введите размер доски: ")
+	_, err := fmt.Scanln(&size)
+	if err != nil || size <= 0 {
+		fmt.Println("Ввод некорректен. Используется размер по умолчанию: 8")
+		size = 8
+	}
+	GenerateBoard(size)
 }
