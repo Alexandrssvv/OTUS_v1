@@ -5,6 +5,18 @@ type Tag struct {
 	name string // Наименование тега, вводимое пользователем.
 }
 
+// New Конструктор, для создания пользователей (User)
+func New(id int, name string) *Tag {
+	return &Tag{
+		id:   id,
+		name: name,
+	}
+}
+
+func (t *Tag) GetID() int {
+	return t.id //Реализация интерфейса
+}
+
 // Геттеры
 func (t *Tag) ID() int {
 	return t.id
