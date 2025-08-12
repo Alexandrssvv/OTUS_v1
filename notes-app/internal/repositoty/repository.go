@@ -2,12 +2,16 @@ package repositoty
 
 import (
 	"fmt"
-	"notes-app/internal/model"
 	"notes-app/internal/model/note"
 	"notes-app/internal/model/note_tag"
 	"notes-app/internal/model/tag"
 	"notes-app/internal/model/user"
 )
+
+// NotesAppIdentifiable — идентифицируемая сущность приложения "Заметки". Объявление интерфейса.
+type NotesAppIdentifiable interface {
+	GetID() int
+}
 
 // "Хранилище в памяти" - различные слайсы
 var (
@@ -25,34 +29,41 @@ var (
 )
 
 // Store - раскладываем по слайсам
-func Store(m model.Model) {
-	switch v := m.(type) {
+func Store(e NotesAppIdentifiable) error {
+	switch v := e.(type) {
 	case *user.User:
 		Users = append(Users, *v)
 		typeCounters["user"]++
 		fmt.Printf("[repo] stored User id=%d (total users=%d)\n", v.GetID(), typeCounters["user"])
+		return nil
 	case *note.Note:
 		Notes = append(Notes, *v)
 		typeCounters["note"]++
 		fmt.Printf("[repo] stored Note id=%d (total notes=%d)\n", v.GetID(), typeCounters["note"])
+		return nil
 	case *tag.Tag:
 		Tags = append(Tags, *v)
 		typeCounters["tag"]++
 		fmt.Printf("[repo] stored Tag id=%d (total tags=%d)\n", v.GetID(), typeCounters["tag"])
+		return nil
 	case *note_tag.NoteTag:
 		NoteTags = append(NoteTags, *v)
 		typeCounters["note_tag"]++
 		fmt.Printf("[repo] stored NoteTag id=%d (note=%d, tag=%d, total links=%d)\n", v.GetID(), v.NoteID(), v.TagID(), typeCounters["note_tag"])
+		return nil
 	default:
-		fmt.Println("[repo] unknown model type — ignored")
+		return fmt.Errorf("Store: unsupported type %T", e)
 	}
 }
 
 // StoreBatch — пакетная запись разных структур через интерфейс.
-func StoreBatch(models ...model.Model) {
-	for _, m := range models {
-		Store(m)
+func StoreBatch(items ...NotesAppIdentifiable) error {
+	for _, it := range items {
+		if err := Store(it); err != nil {
+			return fmt.Errorf("StoreBatch: failed to store item: %w", err)
+		}
 	}
+	return nil
 }
 
 // Counters — возвращает текущие значения счётчиков.

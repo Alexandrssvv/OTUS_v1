@@ -12,18 +12,34 @@ import (
 
 // GenerateData — создаёт User, Note, Tag и NoteTag и отправляет в репозиторий
 func GenerateData() {
-	now := time.Now()
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
 
-	// Создание ID
-	u := user.New(1, "user@example.com", "bcrypt:hash...", now)
-	n := note.New(1, u.GetID(), "Первая заметка", "Текст заметки", now)
-	t := tag.New(1, "Важно")
+	idCounter := 1
 
-	// Связь между заметкой и тегом
-	link := note_tag.New(1, n.GetID(), t.GetID())
+	for {
+		select {
+		case <-ticker.C:
+			now := time.Now()
 
-	// Сохраняем в репозиторий
-	repositoty.StoreBatch(u, n, t, link)
+			// Создание ID
+			u := user.New(idCounter, fmt.Sprintf("user%d@example.com", idCounter), "bcrypt:hash...", now)
+			n := note.New(idCounter, u.GetID(), fmt.Sprintf("Заметка %d", idCounter), "Текст заметки", now)
+			t := tag.New(idCounter, fmt.Sprintf("Тег%d", (idCounter%3)+1))
 
-	fmt.Println("[service] данные успешно созданы и сохранены")
+			// Связь между заметкой и тегом
+			link := note_tag.New(idCounter, n.GetID(), t.GetID())
+
+			// Сохраняем в репозиторий
+			if err := repositoty.StoreBatch(u, n, t, link); err != nil {
+				fmt.Println("store error:", err)
+				return
+			}
+
+			fmt.Println("Данные успешно сгенерированы и сохранены с ID=%d\n", idCounter)
+			fmt.Println("Counters:", repositoty.Counters())
+
+			idCounter++
+		}
+	}
 }
