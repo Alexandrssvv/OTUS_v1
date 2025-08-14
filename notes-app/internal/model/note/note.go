@@ -14,6 +14,22 @@ type Note struct {
 	updatedAt time.Time  // Дата и время последнего обновления заметки.
 }
 
+// New Конструктор, для создания пользователей (User)
+func New(id, userID int, title, content string, createdAt time.Time) *Note {
+	return &Note{
+		id:        id,
+		userID:    userID,
+		title:     title,
+		content:   content,
+		createdAt: createdAt,
+		updatedAt: createdAt,
+	}
+}
+
+func (n *Note) GetID() int {
+	return n.id //Реализация интерфейса
+}
+
 // Геттеры
 func (n *Note) ID() int {
 	return n.id

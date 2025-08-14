@@ -10,6 +10,20 @@ type User struct {
 	createdAt      time.Time //Дата и время создания/регистрации пользователя
 }
 
+// New Конструктор, для создания пользователей (User)
+func New(id int, email string, hashedPassword string, createdAt time.Time) *User {
+	return &User{
+		id:             id,
+		email:          email,
+		hashedPassword: hashedPassword,
+		createdAt:      createdAt,
+	}
+}
+
+func (u *User) GetID() int {
+	return u.id //Реализация интерфейса
+}
+
 // Геттеры
 func (u *User) ID() int {
 	return u.id
